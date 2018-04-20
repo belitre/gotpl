@@ -19,40 +19,64 @@ func TestTemplate(t *testing.T) {
 	}
 
 	tests := []io{
-		io{
+		{
 			Input:    "test: value",
 			Template: "{{.test}}",
 			Output:   "value",
 			Format:   "yaml",
 		},
-		io{
+		{
+			Input:    "",
+			Template: `{{.foo | default "bar"}}`,
+			Output:   "bar",
+			Format:   "yaml",
+		},
+		{
+			Input:    "user: u\npassword: p",
+			Template: `{{ (printf "%s:%s" .user .password) | b64enc }}`,
+			Output:   "dTpw",
+			Format:   "yaml",
+		},
+		{
 			Input:    "name: Max\nage: 15",
 			Template: "Hello {{.name}}, of {{.age}} years old",
 			Output:   "Hello Max, of 15 years old",
 			Format:   "yaml",
 		},
-		io{
+		{
 			Input:    "legumes:\n  - potato\n  - onion\n  - cabbage",
 			Template: "Legumes:{{ range $index, $el := .legumes}}{{if $index}},{{end}} {{$el}}{{end}}",
 			Output:   "Legumes: potato, onion, cabbage",
 			Format:   "yaml",
 		},
-		io{
+		{
 			Input:    "{\"test\": \"value\"}",
 			Template: "{{.test}}",
 			Output:   "value",
 			Format:   "json",
 		},
-		io{
+		{
 			Input:    "{\"name\": \"Max\", \"age\": 15}",
 			Template: "Hello {{.name}}, of {{.age}} years old",
 			Output:   "Hello Max, of 15 years old",
 			Format:   "json",
 		},
-		io{
+		{
 			Input:    "{\"legumes\": [\"potato\", \"onion\", \"cabbage\"]}",
 			Template: "Legumes:{{ range $index, $el := .legumes}}{{if $index}},{{end}} {{$el}}{{end}}",
 			Output:   "Legumes: potato, onion, cabbage",
+			Format:   "json",
+		},
+		{
+			Input:    "{}",
+			Template: `{{.foo | default "bar"}}`,
+			Output:   "bar",
+			Format:   "json",
+		},
+		{
+			Input:    "{\"user\": \"u\", \"password\": \"p\"}",
+			Template: `{{ (printf "%s:%s" .user .password) | b64enc }}`,
+			Output:   "dTpw",
 			Format:   "json",
 		},
 	}
