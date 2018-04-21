@@ -1,17 +1,21 @@
 # gotpl - CLI tool for Golang templates
 
-Forked from github.com/tsg/gotpl 
+Command line tool that compiles Golang
+[templates](http://golang.org/pkg/text/template/) with values from YAML and JSON files.
+
+Supports [Sprig functions](https://github.com/Masterminds/sprig).
+
+Inspired by [Helm](https://github.com/kubernetes/helm)
+
+Started as a fork from github.com/tsg/gotpl but this project looks abandoned
 
 Added the content of pull requests:
  * https://github.com/tsg/gotpl/pull/5
  * https://github.com/tsg/gotpl/pull/7
 
+Also some things from [Helm](https://github.com/kubernetes/helm), like the way they read values.
+
 And some improvements by myself :)
-
-Command line tool that compiles Golang
-[templates](http://golang.org/pkg/text/template/) with values from YAML and JSON files.
-
-Supports [Sprig functions](https://github.com/Masterminds/sprig).
 
 ## Install
 
@@ -32,6 +36,10 @@ and a `user.yml` YAML file like this one:
 You can compile the template like this:
 
     gotpl template -f user.yml
+
+You can set values though the command line too:
+
+    gotpl template -f user.yam --set age=40
 
 You can get help about how to use the command running:
 

@@ -26,6 +26,12 @@
   version = "v1.1.0"
 
 [[projects]]
+  name = "github.com/ghodss/yaml"
+  packages = ["."]
+  revision = "0ca9ea5df5451ffdf184b4428c902747c2c11cd7"
+  version = "v1.0.0"
+
+[[projects]]
   name = "github.com/google/uuid"
   packages = ["."]
   revision = "064e2069ce9c359c118179501254f67d7d37ba24"
@@ -88,9 +94,15 @@
   revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
   version = "v2.2.1"
 
+[[projects]]
+  name = "k8s.io/helm"
+  packages = ["pkg/strvals"]
+  revision = "a80231648a1473929271764b920a8e346f6de844"
+  version = "v2.8.2"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "07c1f753fbd2ab1e945b39bfbe099b1270bfb298d7ae9f61ff313a80167d633b"
+  inputs-digest = "1578e94d3974ada37c5feb6165c8b18767c96029384a3d08ffb691b9a2ff5536"
   solver-name = "gps-cdcl"
   solver-version = 1
