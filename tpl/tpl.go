@@ -13,8 +13,12 @@ import (
 	"text/template"
 )
 
-func executeTemplates(values map[string]interface{}, tplFile string) (string, error) {
-	tpl, err := template.New(path.Base(tplFile)).Funcs(sprig.TxtFuncMap()).ParseFiles(tplFile)
+func executeTemplates(values map[string]interface{}, tplFile string, isStrict bool) (string, error) {
+	tpl := template.New(path.Base(tplFile)).Funcs(sprig.TxtFuncMap())
+	if isStrict {
+		tpl.Option("missingkey=error")
+	}
+	tpl, err := tpl.ParseFiles(tplFile)
 	if err != nil {
 		return "", fmt.Errorf("Error parsing template(s): %v", err)
 	}
@@ -26,20 +30,19 @@ func executeTemplates(values map[string]interface{}, tplFile string) (string, er
 	}
 
 	// Work around to remove the "<no value>" go templates add.
-	// TODO: Add strict mode with Options(missing=error)
 	return strings.Replace(buf.String(), "<no value>", "", -1), nil
 }
 
 // ParseTemplate reads YAML or JSON documents from valueFiles, and extra values
 // from setValues, and it uses those values for the tplFileName template,
 // and writes the executed templates to the out stream.
-func ParseTemplate(tplFileName string, valueFiles []string, setValues []string) error {
+func ParseTemplate(tplFileName string, valueFiles []string, setValues []string, isStrict bool) error {
 	values, err := vals(valueFiles, setValues)
 	if err != nil {
 		return err
 	}
 
-	result, err := executeTemplates(values, tplFileName)
+	result, err := executeTemplates(values, tplFileName, isStrict)
 	if err != nil {
 		return err
 	}

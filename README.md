@@ -7,13 +7,9 @@ Supports [Sprig functions](https://github.com/Masterminds/sprig).
 
 Inspired by [Helm](https://github.com/kubernetes/helm)
 
-Started as a fork from github.com/tsg/gotpl but this project looks abandoned
+Started as a fork from [github.com/tsg/gotpl](https://github.com/tsg/gotpl) but this project looks abandoned
 
-Added the content of pull requests:
- * https://github.com/tsg/gotpl/pull/5
- * https://github.com/tsg/gotpl/pull/7
-
-Also some things from [Helm](https://github.com/kubernetes/helm), like the way they read values.
+Added some things from [Helm](https://github.com/kubernetes/helm), like the way they read values.
 
 And some improvements by myself :)
 
@@ -44,3 +40,8 @@ You can set values though the command line too:
 You can get help about how to use the command running:
 
     gotpl -h
+
+## Development
+
+* Requires `go 1.10.1``
+* [godep](https://github.com/tools/godep) for dependency management

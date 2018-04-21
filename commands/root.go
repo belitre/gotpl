@@ -20,6 +20,7 @@ https://github.com/belitre/gotpl
 
 var valueFiles []string
 var setValues []string
+var isStrict bool
 
 func validateArgs(cmd *cobra.Command, args []string) error {
 	if len(args) != 1 {
@@ -32,7 +33,7 @@ func validateArgs(cmd *cobra.Command, args []string) error {
 }
 
 func runCommand(cmd *cobra.Command, args []string) {
-	if err := tpl.ParseTemplate(args[0], valueFiles, setValues); err != nil {
+	if err := tpl.ParseTemplate(args[0], valueFiles, setValues, isStrict); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
@@ -49,4 +50,5 @@ func init() {
 	rootCmd.PersistentFlags().StringArrayVarP(&valueFiles, "values", "f", []string{}, "specify values in a YAML or JSON files")
 	rootCmd.MarkPersistentFlagRequired("file")
 	rootCmd.PersistentFlags().StringArrayVarP(&setValues, "set", "s", []string{}, "<key>=<value> pairs (take precedence over values in --values files)")
+	rootCmd.PersistentFlags().BoolVarP(&isStrict, "strict", "", false, "If strict is enabled, template rendering will fail if a template references a value that was not passed in")
 }
