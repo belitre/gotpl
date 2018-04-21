@@ -1,13 +1,12 @@
-package main
+package tpl
 
 import (
 	"bytes"
+	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"os"
 	"strings"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestTemplate(t *testing.T) {
@@ -82,22 +81,21 @@ func TestTemplate(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		tpl_file, err := ioutil.TempFile("", "")
+		tplFile, err := ioutil.TempFile("", "")
 		assert.Nil(t, err)
-		defer func() { os.Remove(tpl_file.Name()) }()
+		defer func() { os.Remove(tplFile.Name()) }()
 
-		_, err = tpl_file.WriteString(test.Template)
+		_, err = tplFile.WriteString(test.Template)
 		assert.Nil(t, err)
-		tpl_file.Close()
+		tplFile.Close()
 
 		output := bytes.NewBuffer(nil)
-		values, err := ParseValues(strings.NewReader(test.Input), test.Format)
+		values, err := parseValues(strings.NewReader(test.Input), test.Format)
 		assert.Nil(t, err)
-		err = ExecuteTemplates(values, output,
-			tpl_file.Name())
+		err = executeTemplates(values, output,
+			tplFile.Name())
 		assert.Nil(t, err)
 
 		assert.Equal(t, test.Output, output.String())
-
 	}
 }
