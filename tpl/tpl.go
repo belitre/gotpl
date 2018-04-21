@@ -53,21 +53,18 @@ func parseValues(valuesIn io.Reader, format string) (map[string]interface{}, err
 	return values, nil
 }
 
-// ParseTemplate reads a YAML or JSON document from the v file, uses it as values
-// for the t template and writes the executed templates to
+// ParseTemplate reads a YAML or JSON document from the valuesFileName file, uses it as values
+// for the tplFileName template and writes the executed templates to
 // the out stream.
-func ParseTemplate(t string, v string) error {
-	if _, err := os.Open(t); err != nil {
-		return fmt.Errorf("Error, can't open file %s", t)
-	}
-
-	valuesFile, err := os.Open(v)
+func ParseTemplate(tplFileName string, valuesFileName string) error {
+	valuesFile, err := os.Open(valuesFileName)
 	if err != nil {
-		return fmt.Errorf("Error, can't open file %s", t)
+		return fmt.Errorf("Error, can't open file %s", tplFileName)
 	}
+	defer valuesFile.Close()
 
 	var format string
-	if strings.HasSuffix(v, ".json") {
+	if strings.HasSuffix(valuesFileName, ".json") {
 		format = "json"
 	} else {
 		format = "yaml"
@@ -78,7 +75,7 @@ func ParseTemplate(t string, v string) error {
 		return err
 	}
 
-	err = executeTemplates(values, os.Stdout, t)
+	err = executeTemplates(values, os.Stdout, tplFileName)
 	if err != nil {
 		return err
 	}
