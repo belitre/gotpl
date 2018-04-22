@@ -5,12 +5,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// TODO: makefile with cross compile and set version
 // Version should be updated each time there is a new release
 var (
-	Version      = "v0.2-alpha"
-	GitCommit    = ""
-	GitTreeState = ""
+	Version   = "v0.2"
+	GitCommit = ""
 )
 
 func init() {
@@ -25,9 +23,6 @@ var versionCmd = &cobra.Command{
 		fmt.Printf("gotpl-%s\n", Version)
 		if len(GitCommit) > 0 {
 			fmt.Printf("git commit: %s\n", GitCommit)
-		}
-		if len(GitTreeState) > 0 {
-			fmt.Printf("git tree state: %s\n", GitCommit)
 		}
 	},
 }

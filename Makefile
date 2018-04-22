@@ -39,7 +39,7 @@ test: test-unit
 test-unit:
 	@echo
 	@echo "==> Running unit tests <=="
-	$(GO) test $(GOFLAGS) -run $(TESTS) $(TESTFLAGS)
+	$(GO) test $(TESTS) $(GOFLAGS) $(TESTFLAGS)
 
 .PHONY: clean
 clean:
