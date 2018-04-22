@@ -47,8 +47,8 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringArrayVarP(&valueFiles, "values", "f", []string{}, "specify values in a YAML or JSON files")
-	rootCmd.MarkPersistentFlagRequired("file")
-	rootCmd.PersistentFlags().StringArrayVarP(&setValues, "set", "s", []string{}, "<key>=<value> pairs (take precedence over values in --values files)")
-	rootCmd.PersistentFlags().BoolVarP(&isStrict, "strict", "", false, "If strict is enabled, template rendering will fail if a template references a value that was not passed in")
+	rootCmd.Flags().StringArrayVarP(&valueFiles, "values", "f", []string{}, "specify values in a YAML or JSON files")
+	rootCmd.MarkFlagRequired("file")
+	rootCmd.Flags().StringArrayVarP(&setValues, "set", "s", []string{}, "<key>=<value> pairs (take precedence over values in --values files)")
+	rootCmd.Flags().BoolVarP(&isStrict, "strict", "", false, "If strict is enabled, template rendering will fail if a template references a value that was not passed in")
 }
