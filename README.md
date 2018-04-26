@@ -15,7 +15,7 @@ And some improvements by myself :)
 
 ## Install
 
-    go get github.com/belitre/gotpl
+You can download gotpl binaries for windows, linux and mac from here: https://github.com/belitre/gotpl/releases
 
 ## Usage
 
