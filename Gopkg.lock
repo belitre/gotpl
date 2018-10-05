@@ -10,8 +10,8 @@
 [[projects]]
   name = "github.com/Masterminds/sprig"
   packages = ["."]
-  revision = "6b2a58267f6a8b1dc8e2eb5519b984008fa85e8c"
-  version = "v2.15.0"
+  revision = "15f9564e7e9cf0da02a48e0d25f12a7b83559aa6"
+  version = "v2.16.0"
 
 [[projects]]
   name = "github.com/aokoli/goutils"
@@ -103,6 +103,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "1578e94d3974ada37c5feb6165c8b18767c96029384a3d08ffb691b9a2ff5536"
+  inputs-digest = "95b52d6888a144d5492d753ce2d2c5d895718a75c8f916b803c6cf95610e4904"
   solver-name = "gps-cdcl"
   solver-version = 1
