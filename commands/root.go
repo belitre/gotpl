@@ -10,7 +10,7 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "gotpl template_file",
+	Use:   "gotpl template_file1 template_file2 ...",
 	Short: "CLI tool for Golang templates",
 	Long: `gotpl - CLI tool for Golang templates
 https://github.com/belitre/gotpl

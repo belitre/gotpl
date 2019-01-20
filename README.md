@@ -21,25 +21,41 @@ You can download gotpl binaries for windows, linux and mac from here: https://gi
 
 Say you have a `template` file like this:
 
+```
     {{.first_name}} {{.last_name}} is {{.age}} years old.
+```
 
 and a `user.yml` YAML file like this one:
 
+```
     first_name: Max
     last_name: Mustermann
     age: 30
+```
 
 You can compile the template like this:
 
+```
     gotpl template -f user.yml
+```
+
+You can compile multiple templates at the same time like this (__warning: gotpl will generate a single ouput for all the templates!__):
+
+```
+    gotpl template other_template -f user.yml
+```
 
 You can set values though the command line too:
 
-    gotpl template -f user.yam --set age=40
+```
+    gotpl template -f user.yaml --set age=40
+```
 
 You can get help about how to use the command running:
 
+```
     gotpl -h
+```
 
 ## Development
 
