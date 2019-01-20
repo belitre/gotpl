@@ -61,6 +61,6 @@ endif
 ifndef HAS_GIT
 	$(error You must install Git)
 endif
-	dep ensure
+	dep ensure -v
 
 include versioning.mk
