@@ -3,30 +3,34 @@ package tpl
 import (
 	"bytes"
 	"fmt"
-	"github.com/Masterminds/sprig"
-	"github.com/ghodss/yaml"
 	"io/ioutil"
-	"k8s.io/helm/pkg/strvals"
 	"os"
 	"path"
 	"strings"
 	"text/template"
+
+	"github.com/Masterminds/sprig"
+	"github.com/ghodss/yaml"
+	"k8s.io/helm/pkg/strvals"
 )
 
-func executeTemplates(values map[string]interface{}, tplFile string, isStrict bool) (string, error) {
-	tpl := template.New(path.Base(tplFile)).Funcs(sprig.TxtFuncMap())
-	if isStrict {
-		tpl.Option("missingkey=error")
-	}
-	tpl, err := tpl.ParseFiles(tplFile)
-	if err != nil {
-		return "", fmt.Errorf("Error parsing template(s): %v", err)
-	}
-
+func executeTemplates(values map[string]interface{}, tplFiles []string, isStrict bool) (string, error) {
 	buf := bytes.NewBuffer(nil)
-	err = tpl.Execute(buf, values)
-	if err != nil {
-		return "", fmt.Errorf("Failed to parse standard input: %v", err)
+	for _, f := range tplFiles {
+		tpl := template.New(path.Base(f)).Funcs(sprig.TxtFuncMap())
+		if isStrict {
+			tpl.Option("missingkey=error")
+		}
+
+		tpl, err := tpl.ParseFiles(f)
+		if err != nil {
+			return "", fmt.Errorf("Error parsing template(s): %v", err)
+		}
+
+		err = tpl.Execute(buf, values)
+		if err != nil {
+			return "", fmt.Errorf("Failed to parse standard input: %v", err)
+		}
 	}
 
 	// Work around to remove the "<no value>" go templates add.
@@ -36,13 +40,13 @@ func executeTemplates(values map[string]interface{}, tplFile string, isStrict bo
 // ParseTemplate reads YAML or JSON documents from valueFiles, and extra values
 // from setValues, and it uses those values for the tplFileName template,
 // and writes the executed templates to the out stream.
-func ParseTemplate(tplFileName string, valueFiles []string, setValues []string, isStrict bool) error {
+func ParseTemplate(tplFileNames []string, valueFiles []string, setValues []string, isStrict bool) error {
 	values, err := vals(valueFiles, setValues)
 	if err != nil {
 		return err
 	}
 
-	result, err := executeTemplates(values, tplFileName, isStrict)
+	result, err := executeTemplates(values, tplFileNames, isStrict)
 	if err != nil {
 		return err
 	}
