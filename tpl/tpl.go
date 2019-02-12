@@ -11,13 +11,33 @@ import (
 
 	"github.com/Masterminds/sprig"
 	"github.com/ghodss/yaml"
+	"k8s.io/helm/pkg/chartutil"
 	"k8s.io/helm/pkg/strvals"
 )
+
+func getFunctions() template.FuncMap {
+	f := sprig.TxtFuncMap()
+
+	// from Helm!
+	extra := template.FuncMap{
+		"toToml":   chartutil.ToToml,
+		"toYaml":   chartutil.ToYaml,
+		"fromYaml": chartutil.FromYaml,
+		"toJson":   chartutil.ToJson,
+		"fromJson": chartutil.FromJson,
+	}
+
+	for k, v := range extra {
+		f[k] = v
+	}
+
+	return f
+}
 
 func executeTemplates(values map[string]interface{}, tplFiles []string, isStrict bool) (string, error) {
 	buf := bytes.NewBuffer(nil)
 	for _, f := range tplFiles {
-		tpl := template.New(path.Base(f)).Funcs(sprig.TxtFuncMap())
+		tpl := template.New(path.Base(f)).Funcs(getFunctions())
 		if isStrict {
 			tpl.Option("missingkey=error")
 		}
