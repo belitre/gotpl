@@ -9,7 +9,7 @@ Inspired by [Helm](https://github.com/kubernetes/helm)
 
 Started as a fork from [github.com/tsg/gotpl](https://github.com/tsg/gotpl) but this project looks abandoned
 
-Added some things from [Helm](https://github.com/kubernetes/helm), like the way they read values.
+Added some things from [Helm](https://github.com/kubernetes/helm), like the way they read values, and some functions for the templates.
 
 And some improvements by myself :)
 
