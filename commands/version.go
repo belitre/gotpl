@@ -8,7 +8,7 @@ import (
 
 // Version should be updated each time there is a new release
 var (
-	Version   = "v0.6"
+	Version   = "v0.7"
 	GitCommit = ""
 )
 
