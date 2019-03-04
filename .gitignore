@@ -2,3 +2,4 @@ gotpl
 *.swp
 *.swo
 vendor
+_dist
