@@ -6,11 +6,14 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"text/template"
 
 	"github.com/Masterminds/sprig"
+	"github.com/belitre/gotpl/commands/options"
 	"github.com/ghodss/yaml"
+	"github.com/otiai10/copy"
 	"k8s.io/helm/pkg/chartutil"
 	"k8s.io/helm/pkg/strvals"
 )
@@ -34,45 +37,161 @@ func getFunctions() template.FuncMap {
 	return f
 }
 
-func executeTemplates(values map[string]interface{}, tplFiles []string, isStrict bool) (string, error) {
+func executeSingleTemplate(values map[string]interface{}, tplFile string, isStrict bool) (string, error) {
 	buf := bytes.NewBuffer(nil)
-	for _, f := range tplFiles {
-		tpl := template.New(path.Base(f)).Funcs(getFunctions())
-		if isStrict {
-			tpl.Option("missingkey=error")
-		}
+	tpl := template.New(path.Base(tplFile)).Funcs(getFunctions())
+	if isStrict {
+		tpl.Option("missingkey=error")
+	}
 
-		tpl, err := tpl.ParseFiles(f)
-		if err != nil {
-			return "", fmt.Errorf("Error parsing template(s): %v", err)
-		}
+	tpl, err := tpl.ParseFiles(tplFile)
+	if err != nil {
+		return "", fmt.Errorf("Error parsing template(s): %v", err)
+	}
 
-		err = tpl.Execute(buf, values)
-		if err != nil {
-			return "", fmt.Errorf("Failed to parse standard input: %v", err)
-		}
+	err = tpl.Execute(buf, values)
+	if err != nil {
+		return "", fmt.Errorf("Failed to parse standard input: %v", err)
 	}
 
 	// Work around to remove the "<no value>" go templates add.
 	return strings.Replace(buf.String(), "<no value>", "", -1), nil
 }
 
+func executeTemplates(values map[string]interface{}, tplFileNames []string, isStrict bool, outputPath string) (string, error) {
+	var result string
+	var tmpDir string
+	var err error
+	if len(outputPath) > 0 {
+		tmpDir, err = ioutil.TempDir("", "")
+
+		if err != nil {
+			return "", err
+		}
+		defer func() {
+			os.RemoveAll(tmpDir)
+		}()
+	}
+
+	listFiles, err := getListFiles(tplFileNames)
+
+	if err != nil {
+		return "", err
+	}
+
+	for _, f := range listFiles {
+		r, err := executeSingleTemplate(values, f.src, isStrict)
+		if err != nil {
+			return "", err
+		}
+		if len(tmpDir) > 0 {
+			err = saveFile(path.Join(tmpDir, f.dest), r)
+			if err != nil {
+				return "", err
+			}
+		} else {
+			if len(result) == 0 {
+				result = r
+			} else {
+				result = fmt.Sprintf("%s\n%s", result, r)
+			}
+		}
+	}
+
+	if len(tmpDir) > 0 {
+		err := copy.Copy(tmpDir, outputPath)
+		if err != nil {
+			return "", err
+		}
+	}
+
+	return result, nil
+}
+
+func saveFile(path string, contents string) error {
+	if err := os.MkdirAll(filepath.Dir(path), os.ModePerm); err != nil {
+		return err
+	}
+
+	f, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+
+	defer f.Close()
+
+	if _, err = f.WriteString(contents); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+type SrcDest struct {
+	src  string
+	dest string
+}
+
 // ParseTemplate reads YAML or JSON documents from valueFiles, and extra values
 // from setValues, and it uses those values for the tplFileName template,
 // and writes the executed templates to the out stream.
-func ParseTemplate(tplFileNames []string, valueFiles []string, setValues []string, isStrict bool) error {
-	values, err := vals(valueFiles, setValues)
+func ParseTemplate(tplFileNames []string, opts *options.Options) error {
+	values, err := vals(opts.ValueFiles, opts.SetValues)
 	if err != nil {
 		return err
 	}
 
-	result, err := executeTemplates(values, tplFileNames, isStrict)
+	result, err := executeTemplates(values, tplFileNames, opts.IsStrict, opts.OutputPath)
 	if err != nil {
 		return err
 	}
 
-	fmt.Println(result)
+	if len(result) > 0 {
+		fmt.Println(result)
+	}
+
 	return nil
+}
+
+func getListFiles(tplFileNames []string) ([]*SrcDest, error) {
+	listFiles := []*SrcDest{}
+
+	for _, f := range tplFileNames {
+		cleanPath := path.Clean(f)
+		info, err := os.Stat(cleanPath)
+		if err != nil {
+			return nil, err
+		}
+
+		if info.IsDir() {
+			err := filepath.Walk(f,
+				func(p string, i os.FileInfo, err error) error {
+					if err != nil {
+						return err
+					}
+					if !i.IsDir() {
+						srcdst := &SrcDest{
+							src:  p,
+							dest: strings.Replace(p, cleanPath, "", 1),
+						}
+						listFiles = append(listFiles, srcdst)
+					}
+					return nil
+				})
+			if err != nil {
+				return nil, err
+			}
+
+		} else {
+			srcdst := &SrcDest{
+				src:  cleanPath,
+				dest: filepath.Base(cleanPath),
+			}
+			listFiles = append(listFiles, srcdst)
+		}
+	}
+
+	return listFiles, nil
 }
 
 // HELM CODE

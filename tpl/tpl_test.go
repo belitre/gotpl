@@ -5,6 +5,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/belitre/gotpl/commands/options"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -133,7 +134,7 @@ func TestTemplate(t *testing.T) {
 		{
 			Input: []string{"user=myuser", "password=mypass"},
 			Templates: []string{
-				"{{ .user }}\n",
+				"{{ .user }}",
 				"{{ .password | b64enc }}",
 			},
 			Output: "myuser\nbXlwYXNz",
@@ -157,12 +158,79 @@ func TestTemplate(t *testing.T) {
 		}
 		values, err := vals(nil, test.Input)
 		assert.Nil(t, err)
-		output, err := executeTemplates(values, fileNames, test.Strict)
+		output, err := executeTemplates(values, fileNames, test.Strict, "")
 		if test.Error {
 			assert.NotNil(t, err)
 		} else {
 			assert.Nil(t, err)
 			assert.Equal(t, test.Output, output)
 		}
+	}
+}
+
+func TestOutputFolder(t *testing.T) {
+	tplFiles := []string{
+		"test/tpl1.tpl",
+		"test/tpl2.tpl",
+		"test/folder",
+	}
+
+	outPath := "result"
+
+	err := os.Mkdir(outPath, os.ModePerm)
+	assert.NoError(t, err)
+
+	defer os.RemoveAll(outPath)
+
+	opts := &options.Options{
+		IsStrict:   true,
+		OutputPath: outPath,
+		SetValues: []string{
+			"name=paco",
+			"test=cat",
+			"bleh=pato",
+		},
+		ValueFiles: []string{},
+	}
+
+	err = ParseTemplate(tplFiles, opts)
+	assert.NoError(t, err)
+
+	type result struct {
+		fileName string
+		content  string
+	}
+
+	results := []result{
+		result{
+			fileName: "result/tpl1.tpl",
+			content:  "Hello paco",
+		},
+		result{
+			fileName: "result/tpl2.tpl",
+			content:  "Bye paco",
+		},
+		result{
+			fileName: "result/tpl3.tpl",
+			content:  "Hello cat",
+		},
+		result{
+			fileName: "result/tpl4.tpl",
+			content:  "Bye cat",
+		},
+		result{
+			fileName: "result/sub/tpl5.tpl",
+			content:  "Hello pato",
+		},
+		result{
+			fileName: "result/sub/tpl6.tpl",
+			content:  "Bye pato",
+		},
+	}
+
+	for _, test := range results {
+		c, err := ioutil.ReadFile(test.fileName)
+		assert.NoError(t, err)
+		assert.Equal(t, test.content, string(c[:]))
 	}
 }

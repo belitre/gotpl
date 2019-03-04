@@ -19,7 +19,7 @@ You can download gotpl binaries for windows, linux and mac from here: https://gi
 
 ## Usage
 
-Say you have a `template` file like this:
+Say you have a `template.tpl` file like this:
 
 ```
     {{.first_name}} {{.last_name}} is {{.age}} years old.
@@ -36,20 +36,34 @@ and a `user.yml` YAML file like this one:
 You can compile the template like this:
 
 ```
-    gotpl template -f user.yml
+    gotpl template.tpl -f user.yml
 ```
 
 You can compile multiple templates at the same time like this (__warning: gotpl will generate a single ouput for all the templates!__):
 
 ```
-    gotpl template other_template -f user.yml
+    gotpl template.tpl other_template.tpl -f user.yml
+```
+
+You can compile templates and directories, __includes subdirectories__ (__warning: gotpl will generate a single ouput for all the templates!__):
+
+```
+    gotpl template.tpl /templates/directory -f user.yml
 ```
 
 You can set values though the command line too:
 
 ```
-    gotpl template -f user.yaml --set age=40
+    gotpl template.tpl -f user.yaml --set age=40
 ```
+
+You can set an output folder:
+
+```
+    gotpl template.tpl /templates/directory -f user.yml --set age=40 -o /tplresult
+```
+
+__When using `-o`gotpl will generate files with the same names as the templates, so if the template file is `template.tpl` gotpl will generate `$OUPUT_FOLDER/template.tpl`. If multiple files with the same name are provided then gotpl will override these files and will keep only the last one!__
 
 You can get help about how to use the command running:
 
