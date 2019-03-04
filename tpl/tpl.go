@@ -85,7 +85,7 @@ func executeTemplates(values map[string]interface{}, tplFileNames []string, isSt
 			return "", err
 		}
 		if len(tmpDir) > 0 {
-			err = saveFile(path.Join(tmpDir, f.dest), r)
+			err = saveFile(path.Join(tmpDir, f.dest), r, f.perm)
 			if err != nil {
 				return "", err
 			}
@@ -108,7 +108,7 @@ func executeTemplates(values map[string]interface{}, tplFileNames []string, isSt
 	return result, nil
 }
 
-func saveFile(path string, contents string) error {
+func saveFile(path string, contents string, perm os.FileMode) error {
 	if err := os.MkdirAll(filepath.Dir(path), os.ModePerm); err != nil {
 		return err
 	}
@@ -120,6 +120,10 @@ func saveFile(path string, contents string) error {
 
 	defer f.Close()
 
+	if err = f.Chmod(perm); err != nil {
+		return err
+	}
+
 	if _, err = f.WriteString(contents); err != nil {
 		return err
 	}
@@ -130,6 +134,7 @@ func saveFile(path string, contents string) error {
 type SrcDest struct {
 	src  string
 	dest string
+	perm os.FileMode
 }
 
 // ParseTemplate reads YAML or JSON documents from valueFiles, and extra values
@@ -173,6 +178,7 @@ func getListFiles(tplFileNames []string) ([]*SrcDest, error) {
 						srcdst := &SrcDest{
 							src:  p,
 							dest: strings.Replace(p, cleanPath, "", 1),
+							perm: i.Mode(),
 						}
 						listFiles = append(listFiles, srcdst)
 					}
@@ -186,6 +192,7 @@ func getListFiles(tplFileNames []string) ([]*SrcDest, error) {
 			srcdst := &SrcDest{
 				src:  cleanPath,
 				dest: filepath.Base(cleanPath),
+				perm: info.Mode(),
 			}
 			listFiles = append(listFiles, srcdst)
 		}
