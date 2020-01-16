@@ -73,5 +73,4 @@ You can get help about how to use the command running:
 
 ## Development
 
-* Requires `go 1.10.1``
-* [godep](https://github.com/tools/godep) for dependency management
+* Requires `go 1.13.1``
