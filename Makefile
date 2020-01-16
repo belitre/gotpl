@@ -12,8 +12,12 @@ DIST_DIRS = find * -type d -exec
 # Required for globs to work correctly
 SHELL=/bin/bash
 
+.PHONY: tidy
+tidy:
+	go mod tidy
+
 .PHONY: build
-build:
+build: tidy
 	GOBIN=$(BINDIR) $(GO) install -ldflags '$(LDFLAGS)' github.com/belitre/gotpl/...
 
 # usage: make clean build-cross dist VERSION=v0.2-alpha
@@ -45,22 +49,16 @@ test-unit:
 clean:
 	@rm -rf $(BINDIR) ./_dist
 
-HAS_GODEP := $(shell command -v dep;)
 HAS_GOX := $(shell command -v gox;)
 HAS_GIT := $(shell command -v git;)
 
 .PHONY: bootstrap
 bootstrap:
-ifndef HAS_GODEP
-	$(error You must install dep: https://github.com/golang/dep)
-endif
 ifndef HAS_GOX
 	go get -u github.com/mitchellh/gox
 endif
-
 ifndef HAS_GIT
 	$(error You must install Git)
 endif
-	dep ensure -v
 
 include versioning.mk

@@ -10,7 +10,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/Masterminds/sprig"
+	"github.com/Masterminds/sprig/v3"
 	"github.com/belitre/gotpl/commands/options"
 	"github.com/ghodss/yaml"
 	"github.com/otiai10/copy"
