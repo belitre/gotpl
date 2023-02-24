@@ -16,7 +16,7 @@ require (
 	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/cobra v0.0.5
 	github.com/stretchr/testify v1.4.0
-	golang.org/x/crypto v0.0.0-20200115085410-6d4e4cb37c7d // indirect
+	golang.org/x/crypto v0.1.0 // indirect
 	k8s.io/apimachinery v0.17.1 // indirect
 	k8s.io/helm v2.16.1+incompatible
 )
